@@ -8,17 +8,23 @@ client = discord.Client(intents=intents)
 config_ini = configparser.ConfigParser()
 config_ini.read('config.ini', encoding='utf-8')
 
+def print_time_line():
+    print(datetime.datetime.now())
+    print('------------------------------------')
+
 @client.event
 async def on_ready(): #botログイン完了時に実行
     print('on_ready')
-    print(datetime.datetime.now())
-    print('----------------------------------------------')
+    print_time_line()
 
 def print_info(member,msg):
     print(member)
     print(msg)
-    print(datetime.datetime.now())
-    print('----------------------------------------------')
+    print_time_line()
+
+def add_embed(title, descrip, color):
+    embed = discord.Embed(title = title, description = descrip, color = color)
+    return embed
 
 @client.event
 async def on_raw_reaction_add(payload): #ロール付与機能
@@ -26,9 +32,10 @@ async def on_raw_reaction_add(payload): #ロール付与機能
         checked_emoji = payload.emoji.id 
         guild_id = payload.guild_id 
         guild = discord.utils.find(lambda g: g.id == guild_id, client.guilds)
-        channel_id = config_ini.getint('CHANNEL', 'splFes_ch_id')
-        channel = client.get_channel(channel_id)
+        #channel_id = config_ini.getint('CHANNEL', 'splFes_ch_id')
+        #channel = client.get_channel(channel_id)
         member = guild.get_member(payload.user_id)
+        role_bool = 1
         if checked_emoji == config_ini.getint('FUKA', 'emoji_id'):
             await payload.member.add_roles(guild.get_role(config_ini.getint('FUKA', 'role_id')))
             msg = 'フウカのロールを付与しました！'
@@ -43,6 +50,7 @@ async def on_raw_reaction_add(payload): #ロール付与機能
         guild_id = payload.guild_id 
         guild = discord.utils.find(lambda g: g.id == guild_id, client.guilds)
         member = guild.get_member(payload.user_id)
+        role_bool = 1
         if checked_emoji == config_ini.getint('KORAIDON', 'emoji_id'): 
             await payload.member.add_roles(guild.get_role(config_ini.getint('KORAIDON', 'role_id')))
             msg = 'スカーレットのロールを付与しました！'
@@ -50,10 +58,15 @@ async def on_raw_reaction_add(payload): #ロール付与機能
             await payload.member.add_roles(guild.get_role(config_ini.getint('MIRAIDON', 'role_id')))
             msg = 'バイオレットのロールを付与しました！'
     elif payload.message_id == config_ini.getint('MESSAGE', 'test_msg_id'): 
-        checked_emoji = payload.emoji.id 
-        print(checked_emoji)
-    await payload.member.send(msg)
-    print_info(member,msg)
+        print(payload.emoji.id)
+        print_time_line()
+        role_bool = 0
+    else :
+        role_bool = 0
+    if role_bool == 1:
+        embed = add_embed('ロール変更', msg, int(config_ini.get('COLOR', 'role_lightBlue'),16))
+        await payload.member.send(embed=embed)
+        print_info(member,msg)
 
 @client.event
 async def on_raw_reaction_remove(payload):
@@ -62,6 +75,7 @@ async def on_raw_reaction_remove(payload):
         guild_id = payload.guild_id
         guild = discord.utils.find(lambda g: g.id == guild_id, client.guilds)
         member = guild.get_member(payload.user_id)
+        role_bool = 1
         if checked_emoji == config_ini.getint('FUKA', 'emoji_id'):
             await member.remove_roles(guild.get_role(config_ini.getint('FUKA', 'role_id')))
             msg = 'フウカのロールを外しました！'
@@ -76,14 +90,19 @@ async def on_raw_reaction_remove(payload):
         guild_id = payload.guild_id
         guild = discord.utils.find(lambda g: g.id == guild_id, client.guilds)
         member = guild.get_member(payload.user_id)
+        role_bool = 1
         if checked_emoji == config_ini.getint('KORAIDON', 'emoji_id'):
             await member.remove_roles(guild.get_role(config_ini.getint('KORAIDON', 'role_id')))
             msg = 'スカーレットのロールを外しました！'
         if checked_emoji == config_ini.getint('MIRAIDON', 'emoji_id'):
             await member.remove_roles(guild.get_role(config_ini.getint('MIRAIDON', 'role_id')))
             msg = 'バイオレットのロールを外しました！'
-    await member.send(msg)
-    print_info(member,msg)
+    else :
+        role_bool = 0
+    if role_bool == 1:
+        embed = add_embed('ロール変更', msg, int(config_ini.get('COLOR', 'role_lightBlue'),16))
+        await member.send(embed=embed)
+        print_info(member,msg)
 
 @client.event
 async def on_message(message): #メッセージを検知した時に実行
