@@ -14,6 +14,12 @@ async def on_ready(): #botログイン完了時に実行
     print(datetime.datetime.now())
     print('----------------------------------------------')
 
+def print_info(member,msg):
+    print(member)
+    print(msg)
+    print(datetime.datetime.now())
+    print('----------------------------------------------')
+
 @client.event
 async def on_raw_reaction_add(payload): #ロール付与機能
     if payload.message_id == config_ini.getint('MESSAGE', 'splFes_msg_id_2'): 
@@ -47,10 +53,7 @@ async def on_raw_reaction_add(payload): #ロール付与機能
         checked_emoji = payload.emoji.id 
         print(checked_emoji)
     await payload.member.send(msg)
-    print(member)
-    print(msg)
-    print(datetime.datetime.now())
-    print('----------------------------------------------')
+    print_info(member,msg)
 
 @client.event
 async def on_raw_reaction_remove(payload):
@@ -80,10 +83,7 @@ async def on_raw_reaction_remove(payload):
             await member.remove_roles(guild.get_role(config_ini.getint('MIRAIDON', 'role_id')))
             msg = 'バイオレットのロールを外しました！'
     await member.send(msg)
-    print(msg)
-    print(member)
-    print(datetime.datetime.now())
-    print('----------------------------------------------')
+    print_info(member,msg)
 
 @client.event
 async def on_message(message): #メッセージを検知した時に実行
