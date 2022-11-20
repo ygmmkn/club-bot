@@ -10,7 +10,7 @@ config_ini.read('config.ini', encoding='utf-8')
 
 @client.event
 async def on_ready(): #botログイン完了時に実行
-    print("on_ready")
+    print('on_ready')
     print(datetime.datetime.now())
     print('----------------------------------------------')
 
@@ -25,13 +25,13 @@ async def on_raw_reaction_add(payload): #ロール付与機能
         member = guild.get_member(payload.user_id)
         if checked_emoji == config_ini.getint('FUKA', 'emoji_id'):
             await payload.member.add_roles(guild.get_role(config_ini.getint('FUKA', 'role_id')))
-            print("フウカロールを付与しました！")
+            msg = 'フウカのロールを付与しました！'
         elif checked_emoji == config_ini.getint('UTSUHO', 'emoji_id'):
             await payload.member.add_roles(guild.get_role(config_ini.getint('UTSUHO', 'role_id')))
-            print("ウツホロールを付与しました！")
+            msg = 'ウツホのロールを付与しました！'
         elif checked_emoji == config_ini.getint('MANTARO', 'emoji_id'): 
             await payload.member.add_roles(guild.get_role(config_ini.getint('MANTARO', 'role_id')))
-            print("マンタローロールを付与しました！")
+            msg = 'マンタローのロールを付与しました！'
     elif payload.message_id == config_ini.getint('MESSAGE', 'pokemonSV_msg_id'): 
         checked_emoji = payload.emoji.id 
         guild_id = payload.guild_id 
@@ -39,14 +39,16 @@ async def on_raw_reaction_add(payload): #ロール付与機能
         member = guild.get_member(payload.user_id)
         if checked_emoji == config_ini.getint('KORAIDON', 'emoji_id'): 
             await payload.member.add_roles(guild.get_role(config_ini.getint('KORAIDON', 'role_id')))
-            print("スカーレットのロールを付与しました！")
+            msg = 'スカーレットのロールを付与しました！'
         elif checked_emoji == config_ini.getint('MIRAIDON', 'emoji_id') : 
             await payload.member.add_roles(guild.get_role(config_ini.getint('MIRAIDON', 'role_id')))
-            print("バイオレットのロールを付与しました！")
+            msg = 'バイオレットのロールを付与しました！'
     elif payload.message_id == config_ini.getint('MESSAGE', 'test_msg_id'): 
         checked_emoji = payload.emoji.id 
         print(checked_emoji)
+    await payload.member.send(msg)
     print(member)
+    print(msg)
     print(datetime.datetime.now())
     print('----------------------------------------------')
 
@@ -56,30 +58,29 @@ async def on_raw_reaction_remove(payload):
         checked_emoji = payload.emoji.id
         guild_id = payload.guild_id
         guild = discord.utils.find(lambda g: g.id == guild_id, client.guilds)
+        member = guild.get_member(payload.user_id)
         if checked_emoji == config_ini.getint('FUKA', 'emoji_id'):
-            member = guild.get_member(payload.user_id)
             await member.remove_roles(guild.get_role(config_ini.getint('FUKA', 'role_id')))
-            print("フウカのロールを外しました。")
+            msg = 'フウカのロールを外しました！'
         if checked_emoji == config_ini.getint('UTSUHO', 'emoji_id'): 
-            member = guild.get_member(payload.user_id)
             await member.remove_roles(guild.get_role(config_ini.getint('UTSUHO', 'role_id')))
-            print("ウツホのロールを外しました。")
+            msg = 'ウツホのロールを外しました！'
         if checked_emoji == config_ini.getint('MANTARO', 'emoji_id'): 
-            member = guild.get_member(payload.user_id)
             await member.remove_roles(guild.get_role(config_ini.getint('MANTARO', 'role_id')))
-            print("マンタローのロールを外しました。")
+            msg = 'マンタローのロールを外しました！'
     elif payload.message_id == config_ini.getint('MESSAGE', 'pokemonSV_msg_id'): 
         checked_emoji = payload.emoji.id
         guild_id = payload.guild_id
         guild = discord.utils.find(lambda g: g.id == guild_id, client.guilds)
+        member = guild.get_member(payload.user_id)
         if checked_emoji == config_ini.getint('KORAIDON', 'emoji_id'):
-            member = guild.get_member(payload.user_id)
             await member.remove_roles(guild.get_role(config_ini.getint('KORAIDON', 'role_id')))
-            print("コライドンのロールを外しました。")
+            msg = 'スカーレットのロールを外しました！'
         if checked_emoji == config_ini.getint('MIRAIDON', 'emoji_id'):
-            member = guild.get_member(payload.user_id)
             await member.remove_roles(guild.get_role(config_ini.getint('MIRAIDON', 'role_id')))
-            print("ミライドンのロールを外しました。")
+            msg = 'バイオレットのロールを外しました！'
+    await member.send(msg)
+    print(msg)
     print(member)
     print(datetime.datetime.now())
     print('----------------------------------------------')
