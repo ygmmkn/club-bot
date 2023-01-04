@@ -36,8 +36,9 @@ def print_info(member,msg):
     print(msg)
     print_time_line()
 
-def add_embed(title, descrip, color):
+def add_embed_simple(title, descrip, color, member):
     embed = discord.Embed(title = title, description = descrip, color = color)
+    embed.set_author(name= "["+str(member)+"]さん", )
     return embed
 
 @client.event
@@ -126,7 +127,7 @@ async def on_message(message): #メッセージを検知した時に実行
 
 @client.tree.command(
     name="reset_role",
-    description=config_ini.get('COMMAND_DESCRIPTION', 'reset_role'))
+    description=config_ini.get('COMMAND_00', 'reset_role'))
 async def remove_roles(interaction: discord.Interaction):
     guild_id = config_ini.getint('GUILD', 'guild_id')
     guild = discord.utils.find(lambda g: g.id == guild_id, client.guilds)
@@ -134,7 +135,10 @@ async def remove_roles(interaction: discord.Interaction):
     await member.remove_roles(guild.get_role(config_ini.getint('ROLE_ID', 'fuka')))
     await member.remove_roles(guild.get_role(config_ini.getint('ROLE_ID', 'utsuho')))
     await member.remove_roles(guild.get_role(config_ini.getint('ROLE_ID', 'mantaro')))
-    await interaction.response.send_message( config_ini.getint('GUILD', 'guild_id')+"リセットします。", ephemeral=True)
+    await interaction.response.send_message(config_ini.get('COMMAND_00', 'text'), ephemeral=True)
+    embed = add_embed_simple(config_ini.get('COMMAND_00', 'title'), config_ini.get('COMMAND_00', 'description'), 
+        int(config_ini.get('COLOR', 'roleReset_lightGray'),16), member)
+    await member.send(embed=embed)
+    print_info(member,config_ini.get('COMMAND_00', 'description'))
 
-
-client.run(config_ini.get('TOKEN', 'token'))
+client.run(config_ini.get('TOKEN', 'token_test'))
