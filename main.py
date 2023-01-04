@@ -1,12 +1,26 @@
 import discord
+from discord import app_commands
 # coding: utf-8
 import configparser
 import datetime
 intents = discord.Intents.all()
 intents.message_content = True  # メッセージコンテントのintentはオンにする
 client = discord.Client(intents=intents)
+tree = discord.app_commands.CommandTree(client)
 config_ini = configparser.ConfigParser()
 config_ini.read('config.ini', encoding='utf-8')
+
+MY_GUILD = discord.Object(id=config_ini.getint('GUILD', 'guild_id'))
+
+class MyClient(discord.Client):
+    def __init__(self, *, intents: discord.Intents):
+        super().__init__(intents=intents)
+        self.tree = app_commands.CommandTree(self) 
+    async def setup_hook(self):
+        self.tree.copy_global_to(guild=MY_GUILD)
+        await self.tree.sync(guild=MY_GUILD)
+
+client = MyClient(intents=intents)
 
 def print_time_line():
     print(datetime.datetime.now())
@@ -109,5 +123,18 @@ async def on_message(message): #メッセージを検知した時に実行
         return
     if message.content.startswith('$hello'): #message.content(メッセージ内容)が「$hello」から始まるとき
         await message.channel.send('Hello!') 
+
+@client.tree.command(
+    name="reset_role",
+    description=config_ini.get('COMMAND_DESCRIPTION', 'reset_role'))
+async def remove_roles(interaction: discord.Interaction):
+    guild_id = config_ini.getint('GUILD', 'guild_id')
+    guild = discord.utils.find(lambda g: g.id == guild_id, client.guilds)
+    member = interaction.user
+    await member.remove_roles(guild.get_role(config_ini.getint('ROLE_ID', 'fuka')))
+    await member.remove_roles(guild.get_role(config_ini.getint('ROLE_ID', 'utsuho')))
+    await member.remove_roles(guild.get_role(config_ini.getint('ROLE_ID', 'mantaro')))
+    await interaction.response.send_message( config_ini.getint('GUILD', 'guild_id')+"リセットします。", ephemeral=True)
+
 
 client.run(config_ini.get('TOKEN', 'token'))
