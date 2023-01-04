@@ -44,12 +44,12 @@ def add_embed_simple(title, descrip, color, member):
 @client.event
 async def on_raw_reaction_add(payload): #ロール付与機能
     guild_id = config_ini.getint('GUILD', 'guild_id')
+    guild = discord.utils.find(lambda g: g.id == guild_id, client.guilds)
+    member = guild.get_member(payload.user_id)
     if payload.message_id == config_ini.getint('MESSAGE_ID', 'splFes_msg_id_2'): 
         checked_emoji = payload.emoji.id 
-        guild = discord.utils.find(lambda g: g.id == guild_id, client.guilds)
         #channel_id = config_ini.getint('CHANNEL', 'splFes_ch_id')
         #channel = client.get_channel(channel_id)
-        member = guild.get_member(payload.user_id)
         change_reaction = 1
         if checked_emoji == config_ini.getint('EMOJI_ID', 'fuka'):
             await payload.member.add_roles(guild.get_role(config_ini.getint('ROLE_ID', 'fuka')))
@@ -62,8 +62,6 @@ async def on_raw_reaction_add(payload): #ロール付与機能
             msg = config_ini.get('TEXT', 'mantaro') + 'のロールを付与しました！'
     elif payload.message_id == config_ini.getint('MESSAGE_ID', 'pokemonSV_msg_id'): 
         checked_emoji = payload.emoji.id 
-        guild = discord.utils.find(lambda g: g.id == guild_id, client.guilds)
-        member = guild.get_member(payload.user_id)
         change_reaction = 1
         if checked_emoji == config_ini.getint('EMOJI_ID', 'scarlet'): 
             await payload.member.add_roles(guild.get_role(config_ini.getint('ROLE_ID', 'scarlet')))
@@ -78,17 +76,17 @@ async def on_raw_reaction_add(payload): #ロール付与機能
     else :
         change_reaction = 0
     if change_reaction == 1:
-        embed = add_embed('ロール更新', msg, int(config_ini.get('COLOR', 'role_lightBlue'),16))
+        embed = add_embed_simple('ロール更新', msg, int(config_ini.get('COLOR', 'role_lightBlue'),16), member)
         await payload.member.send(embed=embed)
         print_info(member,msg)
 
 @client.event
 async def on_raw_reaction_remove(payload):
     guild_id = config_ini.getint('GUILD', 'guild_id')
+    guild = discord.utils.find(lambda g: g.id == guild_id, client.guilds)
+    member = guild.get_member(payload.user_id)
     if payload.message_id == config_ini.getint('MESSAGE_ID', 'splFes_msg_id_2'):
         checked_emoji = payload.emoji.id
-        guild = discord.utils.find(lambda g: g.id == guild_id, client.guilds)
-        member = guild.get_member(payload.user_id)
         change_reaction = 1
         if checked_emoji == config_ini.getint('EMOJI_ID', 'fuka'):
             await member.remove_roles(guild.get_role(config_ini.getint('ROLE_ID', 'fuka')))
@@ -101,8 +99,6 @@ async def on_raw_reaction_remove(payload):
             msg = config_ini.get('TEXT', 'mantaro') + 'のロールを外しました！'
     elif payload.message_id == config_ini.getint('MESSAGE_ID', 'pokemonSV_msg_id'): 
         checked_emoji = payload.emoji.id
-        guild = discord.utils.find(lambda g: g.id == guild_id, client.guilds)
-        member = guild.get_member(payload.user_id)
         change_reaction = 1
         if checked_emoji == config_ini.getint('EMOJI_ID', 'scarlet'):
             await member.remove_roles(guild.get_role(config_ini.getint('ROLE_ID', 'scarlet')))
@@ -113,7 +109,7 @@ async def on_raw_reaction_remove(payload):
     else :
         change_reaction = 0
     if change_reaction == 1:
-        embed = add_embed('ロール更新', msg, int(config_ini.get('COLOR', 'role_lightBlue'),16))
+        embed = add_embed_simple('ロール更新', msg, int(config_ini.get('COLOR', 'role_lightBlue'),16), member)
         await member.send(embed=embed)
         print_info(member,msg)
 
